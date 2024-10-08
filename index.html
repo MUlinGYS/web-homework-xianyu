@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待取名</title>
+</head>
+
+<body class="login-img">
+    <div class="login-box" id="login-box">
+        <div class="login-p">
+            <p style="color: white; font-size: 60px; margin: 25px 0 0 0;">Welcome</p>
+        </div>
+        <div class="login-form">
+            <input type="text" placeholder="Username" class="login-input" id="username">
+            <button class="login-btn" id="login-btn">Login</button>
+        </div>
+    </div>
+
+    <!-- 动态加载的内容区域 -->
+    <div id="content-box" style="display: none;height: 75%;width: 70%;background-color: white;border-radius: 5px;">
+        <h1 style="margin-bottom: 3px;text-align: center;height: 60px;box-shadow: 0px 3px 0 0 rgb(236 230 230);">
+            Welcome, <span id="welcome-username"></span>!</h1>
+        <div id="content">
+            <div class="Threads">
+                <div class="Threads" id="threads-container">
+                    <!-- 动态生成的 Threads-p 容器 -->
+                </div>
+                <div class="publish">
+                    <svg t="1728421761271" class="icon" style="margin-right: 3px;" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="4614" width="26" height="26">
+                        <path
+                            d="M350.912 605.376l-299.968-182.72 908.48-355.648-159.072 818.272-387.04-247.872L759.264 263.936zM416 704v209.92l128.256-130.208z"
+                            fill="#ffffff" p-id="4615"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<style>
+    body {
+        margin: 0;
+    }
+
+    .login-img {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        background: url("./img/login.gif");
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-box {
+        width: 30%;
+        min-width: 300px;
+        height: 30%;
+        border-radius: 25px;
+        border: 1px solid black;
+        background-color: #ffffff1a !important;
+        backdrop-filter: blur(5px);
+    }
+
+    .login-p {
+        height: 30%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-form {
+        height: 70%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: space-evenly;
+    }
+
+    .login-input {
+        width: 50%;
+        height: 40px;
+        border-radius: 5px;
+    }
+
+    .login-input:focus {
+        outline: none;
+    }
+
+    .login-btn {
+        width: 20%;
+        height: 30px;
+        border-radius: 25px;
+        background-color: rgb(181, 145, 85);
+    }
+
+    #content {
+        text-align: center;
+        height: calc(100% - 85px);
+    }
+
+    .Threads {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 0px;
+        background: #ededed;
+        box-shadow: inset 35px 35px 70px #e1e1e1,
+            inset -35px -35px 70px #f9f9f9;
+        position: relative;
+        /* 添加相对定位 */
+    }
+
+    .Threads-p {
+        width: 98%;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        margin-top: 5px;
+        background: rgb(238, 174, 202);
+        background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(120, 175, 240, 1) 100%);
+    }
+
+    .Threads-p p {
+        margin: 0;
+    }
+
+    .publish {
+        position: absolute;
+        /* 绝对定位 */
+        bottom: 10px;
+        /* 距离底部 10px */
+        right: 10px;
+        /* 距离右侧 10px */
+        width: 50px;
+        height: 50px;
+        background-color: #0096ff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<script>
+
+    // 给登录按钮添加点击事件监听器
+    document.getElementById('login-btn').addEventListener('click', function () {
+        // 获取输入框中的用户名
+        const username = document.getElementById('username').value;
+
+        // 发起 HTTP 请求检查用户名是否存在
+        fetch('http://localhost:7777/api/users')
+            // 将响应体中的 JSON 数据解析为 JavaScript 对象
+            .then(response => response.json())
+            .then(data => {
+                // 查找与输入用户名匹配的用户对象
+                const user = data.find(user => user.username === username);
+
+                if (user) {
+                    // 更新浏览器历史记录
+                    history.pushState({ username: user.username }, 'Index Page', `?username=${encodeURIComponent(user.username)}`);
+
+                    // 显示内容并隐藏登录框，传入用户的全名
+                    showContent(user.name);
+                } else {
+                    // 用户名不存在时提示错误
+                    alert('Invalid username');
+                }
+            })
+            .catch(error => {
+                // 捕获请求错误并提示
+                console.error('Error fetching data:', error);
+                alert('An error occurred while fetching data');
+            });
+    });
+
+    // 显示内容并隐藏登录框
+    function showContent(username) {
+        // 确认元素存在再设置文本
+        const welcomeUsernameElement = document.getElementById('welcome-username');
+        if (welcomeUsernameElement) {
+            welcomeUsernameElement.textContent = username;
+        }
+        fetchThreadsData()
+        // 显示内容框
+        document.getElementById('content-box').style.display = 'block';
+
+        // 隐藏登录框
+        document.getElementById('login-box').style.display = 'none';
+    }
+
+    // 隐藏内容并显示登录框
+    function hideContent() {
+        // 隐藏内容框
+        document.getElementById('content-box').style.display = 'none';
+
+        // 显示登录框
+        document.getElementById('login-box').style.display = 'block';
+    }
+
+    // 监听浏览器历史记录的变化
+    window.onpopstate = function (event) {
+        const state = event.state;
+        if (state && state.username) {
+            // 显示内容
+            showContent(state.username);
+        } else {
+            // 隐藏内容
+            hideContent();
+        }
+    };
+
+    // 清除 URL 中的查询参数
+    function clearURLParams() {
+        history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // 页面加载时处理 URL 参数
+    // window.location.search 返回拼接的字符串
+    const urlParams = new URLSearchParams(window.location.search);
+    // 获取字符串中username的参数
+    const usernameFromURL = urlParams.get('username');
+
+    if (usernameFromURL) {
+        // 发起 HTTP 请求查找对应用户的 name
+        fetch('http://localhost:7777/api/users')
+            .then(response => response.json())
+            .then(data => {
+                // 查找与输入用户名匹配的用户对象
+                const user = data.find(user => user.username === usernameFromURL);
+
+                if (user) {
+                    // 显示内容
+                    showContent(user.name);
+                } else {
+                    // 隐藏内容
+                    hideContent();
+                    // 清除 URL 中的查询参数
+                    clearURLParams();
+                }
+            })
+
+    } else {
+        // 隐藏内容
+        hideContent();
+    }
+
+    function fetchThreadsData() {
+        fetch('http://localhost:7777/api/threads')
+            .then(response => response.json())
+            .then(data => {
+                const threadsContainer = document.getElementById('threads-container');
+                threadsContainer.innerHTML = ''; // 清空现有内容
+
+                data.forEach(thread => {
+                    const threadDiv = document.createElement('div');
+                    threadDiv.className = 'Threads-p';
+
+                    const threadTitle = document.createElement('p');
+                    threadTitle.textContent = `${thread.icon} ${thread.thread_title}`;
+                    threadTitle.style.margin = '0 0 2px 0'; // 设置 p 标签的 margin 为 0
+
+                    threadDiv.appendChild(threadTitle);
+                    threadsContainer.appendChild(threadDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching threads data:', error);
+                alert('An error occurred while fetching threads data');
+            });
+    }
+</script>
+
+</html>
