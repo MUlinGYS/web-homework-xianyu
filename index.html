@@ -276,9 +276,14 @@
 
     /* 发送框 */
     .content-input {
+        font-size: 20px;
         margin: 0;
         width: calc(100% - 200px);
         height: 45px;
+    }
+
+    .content-input:focus {
+        outline: none;
     }
 </style>
 
@@ -445,7 +450,7 @@
         data.posts.forEach(post => {
             const postItem = document.createElement('li');
             postItem.innerHTML = `
-            <div>
+            <div style="display: flex; align-items: center;">
             <img src="./img/recommend.png" alt="Recommend" class="post-image">
             <span class="post-text">${post.text}</span></div>
             <span class="post-user">- ${post.user}</span>
