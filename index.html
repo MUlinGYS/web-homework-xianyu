@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div id="thread-details" class="details">
-                <div>
+                <div id="thread-id">
                     <div>
                         <h2 id="thread-title"></h2>
                         <p id="thread-user" style="text-align: end;"></p>
@@ -426,6 +426,8 @@
             });
     }
 
+    let globalThreadIdElement;
+
     // 展开对应的帖子
     function fetchThreadDetails(threadId) {
         fetch(`http://localhost:7777/api/threads/${threadId}`)
@@ -433,6 +435,18 @@
             .then(data => {
                 // 展示详细数据
                 showThreadDetails(data);
+
+                // 获取具有特定 id 的元素，并保存引用
+                globalThreadIdElement = document.getElementById('thread-id');
+
+                if (globalThreadIdElement) {
+                    // 保存原始 ID
+                    const originalId = globalThreadIdElement.getAttribute('id');
+                    globalThreadIdElement.dataset.originalId = originalId;
+
+                    // 更改当前 ID
+                    globalThreadIdElement.setAttribute('id', threadId);
+                }
             })
     }
 
@@ -461,8 +475,19 @@
         // 显示弹出窗口并添加 .details-show 类
         document.getElementById('thread-details').classList.add('details-show');
     }
+
     // 关闭按钮点击事件
     document.getElementById('close-button').addEventListener('click', function () {
+        if (globalThreadIdElement) {
+            // 恢复原始 ID
+            const originalId = globalThreadIdElement.dataset.originalId;
+
+            if (originalId) {
+                globalThreadIdElement.setAttribute('id', originalId);
+            }
+        }
+
+        // 移除 .details-show 类
         document.getElementById('thread-details').classList.remove('details-show');
     });
 </script>
