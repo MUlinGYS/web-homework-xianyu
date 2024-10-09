@@ -43,6 +43,7 @@
                     <div>
                         <div style="display: flex;align-items: center;justify-content: center;">
                             <h2 id="thread-title"></h2>
+                            <!-- 删除按钮 -->
                             <button id="delete-thread-btn" class="delete-btn">
                                 <img src="./img/delete.png" alt="Delete" class="delete-image"
                                     style="margin-top: 6px;margin-left: 15px;">
@@ -64,9 +65,10 @@
             <!-- 发布页 -->
             <div id="publish" class="publish">
                 <div style="display: flex;justify-content: space-between;height: 60px;width: 100%;">
-                    <input type="text" placeholder="Icon" style="width: 50px;height: 50px;font-size: 20px;"></input>
+                    <input type="text" placeholder="Icon"
+                        style="width: 50px;height: 50px;font-size: 20px;text-align: center;" id="icon-input"></input>
                     <input type="text" placeholder="thread_title"
-                        style="width: calc(100% - 80px);height: 50px;font-size: 20px;"></input>
+                        style="width: calc(100% - 80px);height: 50px;font-size: 20px;text-align: center;"></input>
                 </div>
                 <div style="width: 100%; height: calc(100% - 150px); display: flex;">
                     <textarea placeholder="text"
@@ -227,6 +229,7 @@
 
     #thread-posts {
         padding: 0;
+        margin-left: 30px;
     }
 
     #thread-posts li {
@@ -248,6 +251,7 @@
     }
 
     .post-user {
+        white-space: nowrap;
         text-align: right;
     }
 
@@ -365,6 +369,11 @@
         border: none;
         cursor: pointer;
         padding: 5px;
+    }
+
+    .delete-post-btn {
+        width: 50px;
+        height: 26px;
     }
 
     .delete-image {
@@ -539,6 +548,8 @@
             })
     }
 
+    let canDelete; // 存储用户是否有权限删除帖子的标志
+
     // 显示详细数据
     function showThreadDetails(data) {
         // 显示详细数据
@@ -547,18 +558,42 @@
         // 用户
         document.getElementById('thread-user').textContent = `By: ${data.user}`;
 
+        //标题旁是否展示按钮的判断
+        const threadUserElement = document.getElementById('thread-user');
+        const deleteThreadBtn = document.getElementById('delete-thread-btn');
+
+        canDelete = data.user === window.globalUsername; // 设置 canDelete 标志
+        if (canDelete) {
+            deleteThreadBtn.style.display = 'inline'; // 显示按钮
+        } else {
+            deleteThreadBtn.style.display = 'none'; // 隐藏按钮
+        }
+
         const threadPosts = document.getElementById('thread-posts');
         threadPosts.innerHTML = ''; // 清空现有内容
 
+        function shouldShowDeleteImage(postUser) {
+            // 检查当前帖子的作者是否与全局用户名相匹配
+            return postUser === window.globalUsername;
+        }
+
+
         data.posts.forEach(post => {
             const postItem = document.createElement('li');
+            const deleteImageHtml = shouldShowDeleteImage(post.user) ? `
+            <img src="./img/delete.png" alt="Delete" class="delete-image" style="margin-top: -2px;">
+            ` : ``; // 如果条件满足，则显示删除图标
             postItem.innerHTML = `
-            <div style="display: flex; align-items: center;">
-            <img src="./img/recommend.png" alt="Recommend" class="post-image">
-            <span class="post-text">${post.text}</span>
+            <div style="display: flex;justify-content: space-between;width: 100%;">
+                <div style="display: flex; align-items: center;">
+                    <img src="./img/recommend.png" alt="Recommend" class="post-image">
+                    <span class="post-text">${post.text}</span>
+                </div>
+                <span class="post-user">- ${post.user}</span>
             </div>
-            <span class="post-user">- ${post.user}</span>
-            
+            <div style="width: 50px;height: 26px;">
+            <button class="delete-post-btn">${deleteImageHtml}</button>
+            </div>
         `;
             threadPosts.appendChild(postItem);
         });
@@ -567,6 +602,43 @@
         document.getElementById('thread-details').classList.add('details-show');
     }
 
+    // 删除帖子按钮
+    // 删除按钮点击事件
+    document.getElementById('delete-thread-btn').addEventListener('click', function () {
+        if (canDelete) {
+            // 获取当前线程的ID
+            const threadId = currentThreadId; // 确保有一个变量存储当前线程的ID
+
+            // 构造请求体
+            const requestBody = {
+                user: window.globalUsername // 使用全局变量中的用户名
+            };
+
+            // 发送DELETE请求到服务器
+            fetch(`http://localhost:7777/api/threads/${threadId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody) // 将请求体转换为JSON字符串
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Thread deleted successfully');
+                        // 刷新线程列表
+                        fetchThreadsData();
+                        // 隐藏详情帖子
+                        document.getElementById('thread-details').classList.remove('details-show');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting thread:', error);
+                    alert('An error occurred while deleting the thread.');
+                });
+        } else {
+            alert('You do not have permission to delete this thread.');
+        }
+    });
     // 关闭按钮点击事件
     document.getElementById('close-button').addEventListener('click', function () {
         // 移除 .details-show 类
@@ -597,7 +669,7 @@
 
     // 当页面完全加载后执行====发布页的名称
     window.onload = function () {
-        // 获取从 URL 参数或登录表单中获取到的用户名
+        // 获取从 URL 参数获取到的用户名
         const username = window.globalUsername || 'DefaultUsername';
 
         // 更新包含用户名的 <p> 标签的内容
@@ -726,6 +798,16 @@
         // 每10秒更新线程列表
         setInterval(updateThreads, 10000);
     };
+
+    document.getElementById('icon-input').addEventListener('input', function (e) {
+        // e.target是事件对象的一个属性，它指向触发事件的元素
+        const inputField = e.target;
+        // 检查输入的字符长度
+        if (inputField.value.length > 1) {
+            alert('Please enter only one character or emoji.');
+            inputField.value = inputField.value.slice(0, 1); // 限制为一个字符
+        }
+    });
 </script>
 
 </html>
