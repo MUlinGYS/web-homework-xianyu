@@ -41,7 +41,13 @@
             <div id="thread-details" class="details">
                 <div id="thread-id">
                     <div>
-                        <h2 id="thread-title"></h2>
+                        <div style="display: flex;align-items: center;justify-content: center;">
+                            <h2 id="thread-title"></h2>
+                            <button id="delete-thread-btn" class="delete-btn">
+                                <img src="./img/delete.png" alt="Delete" class="delete-image"
+                                    style="margin-top: 6px;margin-left: 15px;">
+                            </button>
+                        </div>
                         <p id="thread-user" style="text-align: end;"></p>
                     </div>
                     <div>
@@ -350,6 +356,20 @@
         border: 1px solid #ccc;
         /* 可根据需要设置边框样式 */
     }
+
+    /* 删除按钮 */
+    .delete-btn,
+    .delete-post-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .delete-image {
+        width: 24px;
+        height: 24px;
+    }
 </style>
 
 <script>
@@ -493,6 +513,8 @@
             });
     }
 
+    let timerId; // 存储计时器ID的全局变量关于帖子详情的计时
+
     // 展开对应的帖子
     function fetchThreadDetails(threadId) {
         fetch(`http://localhost:7777/api/threads/${threadId}`)
@@ -503,6 +525,16 @@
 
                 // 更新当前线程 ID
                 currentThreadId = threadId;
+
+                // 如果计时器已经存在，则先清除
+                if (timerId) {
+                    clearInterval(timerId);
+                }
+
+                // 启动一个新的计时器关于帖子
+                timerId = setInterval(function () {
+                    fetchThreadDetails(currentThreadId);
+                }, 10000);
             })
     }
 
@@ -522,8 +554,10 @@
             postItem.innerHTML = `
             <div style="display: flex; align-items: center;">
             <img src="./img/recommend.png" alt="Recommend" class="post-image">
-            <span class="post-text">${post.text}</span></div>
+            <span class="post-text">${post.text}</span>
+            </div>
             <span class="post-user">- ${post.user}</span>
+            
         `;
             threadPosts.appendChild(postItem);
         });
@@ -536,6 +570,11 @@
     document.getElementById('close-button').addEventListener('click', function () {
         // 移除 .details-show 类
         document.getElementById('thread-details').classList.remove('details-show');
+        // 如果计时器存在，则清除
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = null; // 重置计时器ID
+        }
     });
 
     document.getElementById('Send-button').addEventListener('click', function () {
@@ -674,6 +713,18 @@
                 alert('An error occurred while creating the thread.');
             });
     });
+
+
+    //Thread返回的数据每十秒刷新
+    function updateThreads() {
+        fetchThreadsData();
+    }
+
+    // 页面加载完成后设置定时器
+    window.onload = function () {
+        // 每10秒更新线程列表
+        setInterval(updateThreads, 10000);
+    };
 </script>
 
 </html>
