@@ -27,7 +27,7 @@
                 <div class="Threads" id="threads-container">
                     <!-- 动态生成的 Threads-p 容器 -->
                 </div>
-                <div class="publish">
+                <div class="publish-btn-blue">
                     <svg t="1728421761271" class="icon" style="margin-right: 3px;" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="4614" width="26" height="26">
                         <path
@@ -36,6 +36,7 @@
                     </svg>
                 </div>
             </div>
+            <!-- 帖子详情 -->
             <div id="thread-details" class="details">
                 <div id="thread-id">
                     <div>
@@ -50,6 +51,26 @@
                     <input type="text" placeholder="My reply" class="content-input" id="Send">
                     <button class="buttonClass1" id="Send-button">Send</button>
                     <button class="buttonClass2" id="close-button">Close</button>
+                </div>
+            </div>
+
+            <!-- 发布页 -->
+            <div id="publish" class="publish">
+                <div style="display: flex;justify-content: space-between;height: 60px;width: 100%;">
+                    <input type="text" placeholder="Icon" style="width: 50px;height: 50px;font-size: 20px;"></input>
+                    <input type="text" placeholder="thread_title"
+                        style="width: calc(100% - 80px);height: 50px;font-size: 20px;"></input>
+                </div>
+                <div style="width: 100%; height: calc(100% - 150px); display: flex;">
+                    <textarea placeholder="text"
+                        style="width: 100%; font-size: 20px; padding: 10px; box-sizing: border-box; overflow-wrap: break-word;"></textarea>
+                </div>
+                <div>
+                    <p style="text-align: end;"></p>
+                </div>
+                <div style="height: 50px;width: 100%;margin-top: 5px;">
+                    <button class="buttonClass1" id="publish-button">publish</button>
+                    <button class="buttonClass2" id="close-publish-button">Close</button>
                 </div>
             </div>
         </div>
@@ -109,6 +130,10 @@
         outline: none;
     }
 
+    input:focus {
+        outline: none;
+    }
+
     .login-btn {
         width: 20%;
         height: 30px;
@@ -155,7 +180,7 @@
         margin: 0;
     }
 
-    .publish {
+    .publish-btn-blue {
         position: absolute;
         /* 绝对定位 */
         bottom: 10px;
@@ -285,10 +310,47 @@
     .content-input:focus {
         outline: none;
     }
+
+    /* 发布页 */
+    .publish {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: rgb(174, 212, 238);
+        background: radial-gradient(circle, rgba(174, 212, 238, 1) 0%, rgba(120, 207, 240, 0.989233193277311) 18%);
+    }
+
+    /* 发布页输入口 */
+    /* 取消选中时的样式 */
+    textarea:focus {
+        outline: none;
+        /* 取消聚焦时的外框 */
+    }
+
+    /* 设置textarea的样式 */
+    textarea {
+        width: 100%;
+        font-size: 20px;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        resize: none;
+        /* 禁止调整大小 */
+        border: 1px solid #ccc;
+        /* 可根据需要设置边框样式 */
+    }
 </style>
 
 <script>
-
     // 给登录按钮添加点击事件监听器
     document.getElementById('login-btn').addEventListener('click', function () {
         // 获取输入框中的用户名
@@ -389,6 +451,9 @@
         hideContent();
     }
 
+    // 当前线程 ID
+    let currentThreadId;
+
     function fetchThreadsData() {
         fetch('http://localhost:7777/api/threads')
             .then(response => response.json())
@@ -426,8 +491,6 @@
             });
     }
 
-    let globalThreadIdElement;
-
     // 展开对应的帖子
     function fetchThreadDetails(threadId) {
         fetch(`http://localhost:7777/api/threads/${threadId}`)
@@ -436,17 +499,8 @@
                 // 展示详细数据
                 showThreadDetails(data);
 
-                // 获取具有特定 id 的元素，并保存引用
-                globalThreadIdElement = document.getElementById('thread-id');
-
-                if (globalThreadIdElement) {
-                    // 保存原始 ID
-                    const originalId = globalThreadIdElement.getAttribute('id');
-                    globalThreadIdElement.dataset.originalId = originalId;
-
-                    // 更改当前 ID
-                    globalThreadIdElement.setAttribute('id', threadId);
-                }
+                // 更新当前线程 ID
+                currentThreadId = threadId;
             })
     }
 
@@ -478,18 +532,79 @@
 
     // 关闭按钮点击事件
     document.getElementById('close-button').addEventListener('click', function () {
-        if (globalThreadIdElement) {
-            // 恢复原始 ID
-            const originalId = globalThreadIdElement.dataset.originalId;
-
-            if (originalId) {
-                globalThreadIdElement.setAttribute('id', originalId);
-            }
-        }
-
         // 移除 .details-show 类
         document.getElementById('thread-details').classList.remove('details-show');
     });
+
+    document.getElementById('Send-button').addEventListener('click', function () {
+        sendReply(currentThreadId);
+    });
+
+    // 获取当前页面的 URL
+    const currentUrl = new URL(window.location.href);
+
+    // 创建 URLSearchParams 对象
+    const queryParams = new URLSearchParams(currentUrl.search);
+
+    // 获取 username 参数
+    const username = queryParams.get('username');
+    if (username) {
+        // 存储到全局变量
+        window.globalUsername = username;
+    }
+
+    // 当页面完全加载后执行====发布页的名称
+    window.onload = function () {
+        // 获取从 URL 参数或登录表单中获取到的用户名
+        const username = window.globalUsername || 'DefaultUsername';
+
+        // 更新包含用户名的 <p> 标签的内容
+        const usernameParagraph = document.querySelector('.publish p');
+        if (usernameParagraph) {
+            usernameParagraph.textContent = `- ${username}`;
+        }
+    };
+
+    // 发送回复的文本
+    function sendReply(currentThreadId) {
+        // 获取回复文本
+        const replyText = document.getElementById('Send').value.trim();
+        if (!replyText) {
+            alert('Please enter a reply message.');
+            return;
+        }
+
+        // 使用全局变量作为用户名
+        const user = window.globalUsername || 'DefaultUsername';
+
+        // 拼接 URL 并发送 POST 请求
+        fetch(`http://localhost:7777/api/threads/${currentThreadId}/posts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: replyText,
+                user: user // 使用全局变量或默认用户名
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 处理回复成功
+                console.log('Reply sent successfully:', data);
+
+                // 清空输入框
+                document.getElementById('Send').value = '';
+
+                // 刷新帖子列表
+                fetchThreadDetails(currentThreadId);
+            })
+            .catch(error => {
+                // 处理错误情况
+                console.error('Error sending reply:', error);
+                alert('An error occurred while sending your reply.');
+            });
+    }
 </script>
 
 </html>
