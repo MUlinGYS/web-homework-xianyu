@@ -36,6 +36,22 @@
                     </svg>
                 </div>
             </div>
+            <div id="thread-details" class="details">
+                <div>
+                    <div>
+                        <h2 id="thread-title"></h2>
+                        <p id="thread-user" style="text-align: end;"></p>
+                    </div>
+                    <div>
+                        <ul id="thread-posts"></ul>
+                    </div>
+                </div>
+                <div style="height: 50px;display: flex;justify-content: space-around;">
+                    <input type="text" placeholder="My reply" class="content-input" id="Send">
+                    <button class="buttonClass1" id="Send-button">Send</button>
+                    <button class="buttonClass2" id="close-button">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
@@ -117,16 +133,20 @@
             inset -35px -35px 70px #f9f9f9;
         position: relative;
         /* 添加相对定位 */
+        overflow-y: auto;
+        /* 添加垂直滚动条 */
     }
 
     .Threads-p {
-        width: 98%;
+        width: 96%;
         height: 35px;
+        min-height: 35px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         border-radius: 5px;
         margin-top: 5px;
+        padding: 0 13px;
         background: rgb(238, 174, 202);
         background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(120, 175, 240, 1) 100%);
     }
@@ -149,6 +169,116 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .details {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: rgb(174, 186, 238);
+        background: radial-gradient(circle, rgba(174, 186, 238, 1) 0%, rgba(120, 240, 152, 0.989233193277311) 100%);
+    }
+
+    .details-show {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #thread-posts {
+        padding: 0;
+    }
+
+    #thread-posts li {
+        font-size: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+        /* 默认无下划线 */
+    }
+
+    #thread-posts li:hover {
+        text-decoration: underline;
+        /* 鼠标悬停时显示下划线 */
+    }
+
+    .post-text {
+        text-align: left;
+    }
+
+    .post-user {
+        text-align: right;
+    }
+
+    /* 设置图片样式 */
+    .post-image {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+
+    /* 提交按钮 */
+
+    .buttonClass1 {
+        font-size: 15px;
+        font-family: Arial;
+        width: 80px;
+        height: 50px;
+        border-width: 1px;
+        color: #fff;
+        border-color: #566963;
+        font-weight: bold;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        box-shadow: inset 0px 1px 3px 0px #91b8b3;
+        text-shadow: inset 0px -1px 0px #2b665e;
+        background: linear-gradient(rgba(38, 218, 172, 1), rgba(16, 235, 121, 1));
+    }
+
+    .buttonClass1:hover {
+        background: linear-gradient(rgba(16, 235, 121, 1), rgba(38, 218, 172, 1));
+    }
+
+    /* 退出按钮 */
+    .buttonClass2 {
+        font-size: 15px;
+        font-family: Arial;
+        width: 80px;
+        height: 50px;
+        border-width: 1px;
+        color: #fff;
+        border-color: #566963;
+        font-weight: bold;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        box-shadow: inset 0px 1px 3px 0px #91b8b3;
+        text-shadow: inset 0px -1px 0px #2b665e;
+        background: linear-gradient(#768d87, #6c7c7c);
+    }
+
+    .buttonClass2:hover {
+        background: linear-gradient(#6c7c7c, #768d87);
+    }
+
+    /* 发送框 */
+    .content-input {
+        margin: 0;
+        width: calc(100% - 200px);
+        height: 45px;
     }
 </style>
 
@@ -192,7 +322,8 @@
         if (welcomeUsernameElement) {
             welcomeUsernameElement.textContent = username;
         }
-        fetchThreadsData()
+        fetchThreadsData();
+
         // 显示内容框
         document.getElementById('content-box').style.display = 'block';
 
@@ -227,9 +358,7 @@
     }
 
     // 页面加载时处理 URL 参数
-    // window.location.search 返回拼接的字符串
     const urlParams = new URLSearchParams(window.location.search);
-    // 获取字符串中username的参数
     const usernameFromURL = urlParams.get('username');
 
     if (usernameFromURL) {
@@ -250,7 +379,6 @@
                     clearURLParams();
                 }
             })
-
     } else {
         // 隐藏内容
         hideContent();
@@ -266,13 +394,25 @@
                 data.forEach(thread => {
                     const threadDiv = document.createElement('div');
                     threadDiv.className = 'Threads-p';
+                    threadDiv.id = thread.id;
 
                     const threadTitle = document.createElement('p');
                     threadTitle.textContent = `${thread.icon} ${thread.thread_title}`;
-                    threadTitle.style.margin = '0 0 2px 0'; // 设置 p 标签的 margin 为 0
+                    threadTitle.style.margin = '0 0 2px 0'; // 设置 p 标签的 margin
+
+                    const threadUser = document.createElement('p');
+                    threadUser.textContent = `By: ${thread.user}`;
+                    threadUser.style.margin = '0'; // 设置 p 标签的 margin
 
                     threadDiv.appendChild(threadTitle);
+                    threadDiv.appendChild(threadUser);
                     threadsContainer.appendChild(threadDiv);
+
+                    // 添加点击事件
+                    threadDiv.addEventListener('click', function () {
+                        const threadId = this.id;
+                        fetchThreadDetails(threadId);
+                    });
                 });
             })
             .catch(error => {
@@ -280,6 +420,46 @@
                 alert('An error occurred while fetching threads data');
             });
     }
+
+    // 展开对应的帖子
+    function fetchThreadDetails(threadId) {
+        fetch(`http://localhost:7777/api/threads/${threadId}`)
+            .then(response => response.json())
+            .then(data => {
+                // 展示详细数据
+                showThreadDetails(data);
+            })
+    }
+
+    // 显示详细数据
+    function showThreadDetails(data) {
+        // 显示详细数据
+        // 标题
+        document.getElementById('thread-title').textContent = `${data.icon} ${data.thread_title}`;
+        // 用户
+        document.getElementById('thread-user').textContent = `By: ${data.user}`;
+
+        const threadPosts = document.getElementById('thread-posts');
+        threadPosts.innerHTML = ''; // 清空现有内容
+
+        data.posts.forEach(post => {
+            const postItem = document.createElement('li');
+            postItem.innerHTML = `
+            <div>
+            <img src="./img/recommend.png" alt="Recommend" class="post-image">
+            <span class="post-text">${post.text}</span></div>
+            <span class="post-user">- ${post.user}</span>
+        `;
+            threadPosts.appendChild(postItem);
+        });
+
+        // 显示弹出窗口并添加 .details-show 类
+        document.getElementById('thread-details').classList.add('details-show');
+    }
+    // 关闭按钮点击事件
+    document.getElementById('close-button').addEventListener('click', function () {
+        document.getElementById('thread-details').classList.remove('details-show');
+    });
 </script>
 
 </html>
