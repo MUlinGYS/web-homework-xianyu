@@ -314,6 +314,7 @@
 
     /* 发布页 */
     .publish {
+        display: none;
         position: absolute;
         top: 50%;
         left: 50%;
@@ -606,6 +607,73 @@
                 alert('An error occurred while sending your reply.');
             });
     }
+
+    // 发布按钮和取消按钮
+    // 获取发布按钮和关闭按钮的 DOM 元素
+    const publishBtn = document.querySelector('.publish-btn-blue');
+    const closeButton = document.getElementById('close-publish-button');
+    const publishDiv = document.getElementById('publish');
+
+    // 发布按钮点击事件
+    publishBtn.addEventListener('click', function () {
+        // 设置发布页的 display 为 block 来显示它
+        publishDiv.style.display = 'block';
+    });
+
+    // 关闭按钮点击事件
+    closeButton.addEventListener('click', function () {
+        // 设置发布页的 display 为 none 来隐藏它
+        publishDiv.style.display = 'none';
+    });
+
+
+    //发布逻辑
+    document.getElementById('publish-button').addEventListener('click', function () {
+        // 获取输入框中的值
+        const iconInput = document.querySelector('input[placeholder="Icon"]');
+        const threadTitleInput = document.querySelector('input[placeholder="thread_title"]');
+        const textInput = document.querySelector('textarea[placeholder="text"]');
+        const username = window.globalUsername;
+
+        // 构造请求体
+        const requestBody = {
+            user: username,
+            thread_title: threadTitleInput.value,
+            icon: iconInput.value,
+            text: textInput.value
+        };
+
+        // 发送 POST 请求
+        fetch('http://localhost:7777/api/threads', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Network response was not ok.');
+                }
+            })
+            .then(data => {
+                // 刷新帖子列表
+                fetchThreadsData();
+                // 清空发布页的输入框
+                iconInput.value = '';
+                threadTitleInput.value = '';
+                textInput.value = '';
+                // 关闭发布页
+                const publishDiv = document.getElementById('publish');
+                publishDiv.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error creating thread:', error);
+                alert('An error occurred while creating the thread.');
+            });
+    });
 </script>
 
 </html>
