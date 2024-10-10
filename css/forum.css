@@ -1,0 +1,293 @@
+    body {
+        margin: 0;
+    }
+
+    .login-img {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        background: url("./img/login.gif");
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-box {
+        width: 30%;
+        min-width: 300px;
+        height: 30%;
+        border-radius: 25px;
+        border: 1px solid black;
+        background-color: #ffffff1a !important;
+        backdrop-filter: blur(5px);
+    }
+
+    .login-p {
+        height: 30%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-form {
+        height: 70%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: space-evenly;
+    }
+
+    .login-input {
+        width: 50%;
+        height: 40px;
+        border-radius: 5px;
+    }
+
+    .login-input:focus {
+        outline: none;
+    }
+
+    input:focus {
+        outline: none;
+    }
+
+    .login-btn {
+        width: 20%;
+        height: 30px;
+        border-radius: 25px;
+        background-color: rgb(181, 145, 85);
+    }
+
+    #content {
+        text-align: center;
+        height: calc(100% - 85px);
+    }
+
+    .Threads {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 0px;
+        background: #ededed;
+        box-shadow: inset 35px 35px 70px #e1e1e1,
+            inset -35px -35px 70px #f9f9f9;
+        position: relative;
+        /* 添加相对定位 */
+        overflow-y: auto;
+        /* 添加垂直滚动条 */
+    }
+
+    .Threads-p {
+        width: 96%;
+        height: 35px;
+        min-height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 5px;
+        margin-top: 5px;
+        padding: 0 13px;
+        background: rgb(238, 174, 202);
+        background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(120, 175, 240, 1) 100%);
+    }
+
+    .Threads-p p {
+        margin: 0;
+    }
+
+    .publish-btn-blue {
+        position: absolute;
+        /* 绝对定位 */
+        bottom: 10px;
+        /* 距离底部 10px */
+        right: 10px;
+        /* 距离右侧 10px */
+        width: 50px;
+        height: 50px;
+        background-color: #0096ff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .details {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: rgb(174, 186, 238);
+        background: radial-gradient(circle, rgba(174, 186, 238, 1) 0%, rgba(120, 240, 152, 0.989233193277311) 100%);
+    }
+
+    .details-show {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #thread-posts {
+        padding: 0;
+        margin-left: 30px;
+    }
+
+    #thread-posts li {
+        font-size: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+        /* 默认无下划线 */
+    }
+
+    #thread-posts li:hover {
+        text-decoration: underline;
+        /* 鼠标悬停时显示下划线 */
+    }
+
+    .post-text {
+        text-align: left;
+    }
+
+    .post-user {
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    /* 设置图片样式 */
+    .post-image {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+
+    /* 提交按钮 */
+
+    .buttonClass1 {
+        font-size: 15px;
+        font-family: Arial;
+        width: 80px;
+        height: 50px;
+        border-width: 1px;
+        color: #fff;
+        border-color: #566963;
+        font-weight: bold;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        box-shadow: inset 0px 1px 3px 0px #91b8b3;
+        text-shadow: inset 0px -1px 0px #2b665e;
+        background: linear-gradient(rgba(38, 218, 172, 1), rgba(16, 235, 121, 1));
+    }
+
+    .buttonClass1:hover {
+        background: linear-gradient(rgba(16, 235, 121, 1), rgba(38, 218, 172, 1));
+    }
+
+    /* 退出按钮 */
+    .buttonClass2 {
+        font-size: 15px;
+        font-family: Arial;
+        width: 80px;
+        height: 50px;
+        border-width: 1px;
+        color: #fff;
+        border-color: #566963;
+        font-weight: bold;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        box-shadow: inset 0px 1px 3px 0px #f30606;
+        text-shadow: inset 0px -1px 0px #ff0000;
+        background: rgb(228, 93, 93);
+        background: radial-gradient(circle, rgba(228, 93, 93, 0.9976365546218487) 0%, rgba(232, 7, 7, 0.989233193277311) 100%);
+    }
+
+    .buttonClass2:hover {
+        background: linear-gradient(#ff3300, #ff0000);
+    }
+
+    /* 发送框 */
+    .content-input {
+        font-size: 20px;
+        margin: 0;
+        width: calc(100% - 200px);
+        height: 45px;
+    }
+
+    .content-input:focus {
+        outline: none;
+    }
+
+    /* 发布页 */
+    .publish {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: rgb(174, 212, 238);
+        background: radial-gradient(circle, rgba(174, 212, 238, 1) 0%, rgba(120, 207, 240, 0.989233193277311) 18%);
+    }
+
+    /* 发布页输入口 */
+    /* 取消选中时的样式 */
+    textarea:focus {
+        outline: none;
+        /* 取消聚焦时的外框 */
+    }
+
+    /* 设置textarea的样式 */
+    textarea {
+        width: 100%;
+        font-size: 20px;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        resize: none;
+        /* 禁止调整大小 */
+        border: 1px solid #ccc;
+        /* 可根据需要设置边框样式 */
+    }
+
+    /* 删除按钮 */
+    .delete-btn,
+    .delete-post-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .delete-post-btn {
+        width: 50px;
+        height: 26px;
+    }
+
+    .delete-image {
+        width: 24px;
+        height: 24px;
+    }
