@@ -419,7 +419,7 @@ document.getElementById('icon-input').addEventListener('input', function (e) {
     const inputField = e.target;
     // 检查输入的字符长度
     if (inputField.value.length > 2) {
-        alert('Please enter only one character or emoji.');
+        alert('Please enter only two character or emoji.');
         inputField.value = inputField.value.slice(0, 2); // 限制为两个个字符（一个emoji）
     }
 });
