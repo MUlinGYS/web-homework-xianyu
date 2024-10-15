@@ -141,6 +141,28 @@
     #thread-posts {
         padding: 0;
         margin-left: 30px;
+        max-height: 300px;
+        overflow-y: auto;
+        /* 垂直方向超出时显示滚动条 */
+        overflow-x: hidden;
+        /* 水平方向超出时隐藏内容 */
+    }
+    
+    #thread-posts::-webkit-scrollbar {
+        width: 8px;
+        /* 滚动条宽度 */
+    }
+
+    #thread-posts::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.5);
+        /* 滚动条颜色，可以设置透明度 */
+        border-radius: 4px;
+        /* 滚动条圆角 */
+    }
+
+    #thread-posts::-webkit-scrollbar-track {
+        background-color: transparent;
+        /* 滚动条轨道颜色 */
     }
 
     #thread-posts li {

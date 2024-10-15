@@ -244,6 +244,12 @@ document.getElementById('delete-thread-btn').addEventListener('click', function 
                     fetchThreadsData();
                     // 隐藏详情帖子
                     document.getElementById('thread-details').classList.remove('details-show');
+                    
+                    // 如果计时器存在，则清除
+                    if (timerId) {
+                    clearInterval(timerId);
+                    timerId = null; // 重置计时器ID
+                    }
                 }
             })
             .catch(error => {
